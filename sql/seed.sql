@@ -1,0 +1,66 @@
+-- Seed data for Personal Knowledge & Learning Tracker
+
+INSERT INTO users (id, full_name, email) VALUES
+    ('11111111-1111-1111-1111-111111111111', 'Alex Carter', 'alex.carter@example.edu'),
+    ('22222222-2222-2222-2222-222222222222', 'Brianna Lee', 'brianna.lee@example.edu'),
+    ('33333333-3333-3333-3333-333333333333', 'Carlos Nguyen', 'carlos.nguyen@example.edu'),
+    ('44444444-4444-4444-4444-444444444444', 'Dana Patel', 'dana.patel@example.edu'),
+    ('55555555-5555-5555-5555-555555555555', 'Elena Rossi', 'elena.rossi@example.edu');
+
+INSERT INTO topics (id, user_id, name, description) VALUES
+    ('00000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'Databases', 'Relational modeling and SQL practice.'),
+    ('00000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'Python', 'Core Python language features and libraries.'),
+    ('00000000-0000-0000-0000-000000000003', '22222222-2222-2222-2222-222222222222', 'Systems Design', 'Scalable systems and architecture fundamentals.'),
+    ('00000000-0000-0000-0000-000000000004', '22222222-2222-2222-2222-222222222222', 'Data Structures', 'Lists, trees, graphs, and complexity.'),
+    ('00000000-0000-0000-0000-000000000005', '33333333-3333-3333-3333-333333333333', 'Machine Learning', 'Supervised learning and model evaluation.'),
+    ('00000000-0000-0000-0000-000000000006', '33333333-3333-3333-3333-333333333333', 'Web Security', 'OWASP basics and secure coding.'),
+    ('00000000-0000-0000-0000-000000000007', '44444444-4444-4444-4444-444444444444', 'Operating Systems', 'Processes, scheduling, and memory.'),
+    ('00000000-0000-0000-0000-000000000008', '44444444-4444-4444-4444-444444444444', 'Networking', 'TCP/IP, routing, and network protocols.'),
+    ('00000000-0000-0000-0000-000000000009', '55555555-5555-5555-5555-555555555555', 'Algorithms', 'Design and analysis of algorithms.'),
+    ('00000000-0000-0000-0000-00000000000a', '55555555-5555-5555-5555-555555555555', 'Advanced Databases', 'Indexing, transactions, and query optimization.');
+
+INSERT INTO resources (id, topic_id, title, url, resource_type) VALUES
+    ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'SQL Basics', 'https://example.com/sql-basics', 'article'),
+    ('10000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000001', 'Normalization Guide', 'https://example.com/normalization', 'article'),
+    ('10000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000002', 'Python Standard Library', 'https://example.com/python-stdlib', 'reference'),
+    ('10000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000002', 'Python OOP Tutorial', 'https://example.com/python-oop', 'video'),
+    ('10000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000003', 'Scalable Systems Notes', 'https://example.com/scalable-systems', 'notes'),
+    ('10000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000003', 'Load Balancing Patterns', 'https://example.com/load-balancing', 'article'),
+    ('10000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000004', 'Trees and Graphs', 'https://example.com/trees-graphs', 'chapter'),
+    ('10000000-0000-0000-0000-000000000008', '00000000-0000-0000-0000-000000000004', 'Big-O Cheat Sheet', 'https://example.com/big-o', 'reference'),
+    ('10000000-0000-0000-0000-000000000009', '00000000-0000-0000-0000-000000000005', 'Model Evaluation', 'https://example.com/model-evaluation', 'article'),
+    ('10000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-000000000005', 'Linear Regression Walkthrough', 'https://example.com/linear-regression', 'video'),
+    ('10000000-0000-0000-0000-00000000000b', '00000000-0000-0000-0000-000000000006', 'OWASP Top 10', 'https://example.com/owasp-top-10', 'reference'),
+    ('10000000-0000-0000-0000-00000000000c', '00000000-0000-0000-0000-000000000006', 'Secure Coding Checklist', 'https://example.com/secure-checklist', 'checklist'),
+    ('10000000-0000-0000-0000-00000000000d', '00000000-0000-0000-0000-000000000007', 'Process Scheduling', 'https://example.com/process-scheduling', 'article'),
+    ('10000000-0000-0000-0000-00000000000e', '00000000-0000-0000-0000-000000000008', 'TCP/IP Primer', 'https://example.com/tcp-ip', 'article'),
+    ('10000000-0000-0000-0000-00000000000f', '00000000-0000-0000-0000-000000000009', 'Dynamic Programming Patterns', 'https://example.com/dp-patterns', 'notes');
+
+INSERT INTO learning_sessions (id, user_id, topic_id, session_date, duration_minutes, notes) VALUES
+    ('20000000-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-000000000001', '2026-01-10', 90, 'Reviewed normalization and functional dependencies.'),
+    ('20000000-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-000000000002', '2026-01-12', 60, 'Practiced list comprehensions and dict methods.'),
+    ('20000000-0000-0000-0000-000000000003', '22222222-2222-2222-2222-222222222222', '00000000-0000-0000-0000-000000000003', '2026-01-15', 75, 'Sketched a 3-tier architecture example.'),
+    ('20000000-0000-0000-0000-000000000004', '22222222-2222-2222-2222-222222222222', '00000000-0000-0000-0000-000000000004', '2026-01-17', 50, 'Worked through tree traversal problems.'),
+    ('20000000-0000-0000-0000-000000000005', '33333333-3333-3333-3333-333333333333', '00000000-0000-0000-0000-000000000005', '2026-01-18', 120, 'Built a small regression model and evaluated metrics.'),
+    ('20000000-0000-0000-0000-000000000006', '33333333-3333-3333-3333-333333333333', '00000000-0000-0000-0000-000000000006', '2026-01-20', 55, 'Reviewed common web vulnerabilities.'),
+    ('20000000-0000-0000-0000-000000000007', '44444444-4444-4444-4444-444444444444', '00000000-0000-0000-0000-000000000007', '2026-01-22', 80, 'Summarized CPU scheduling algorithms.'),
+    ('20000000-0000-0000-0000-000000000008', '44444444-4444-4444-4444-444444444444', '00000000-0000-0000-0000-000000000008', '2026-01-23', 70, 'Compared TCP and UDP behavior.'),
+    ('20000000-0000-0000-0000-000000000009', '55555555-5555-5555-5555-555555555555', '00000000-0000-0000-0000-000000000009', '2026-01-25', 110, 'Solved dynamic programming exercises.'),
+    ('20000000-0000-0000-0000-00000000000a', '55555555-5555-5555-5555-555555555555', '00000000-0000-0000-0000-00000000000a', '2026-01-26', 95, 'Explored indexing strategies and B-trees.'),
+    ('20000000-0000-0000-0000-00000000000b', '11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-000000000001', '2026-02-01', 40, 'Wrote practice SQL queries with joins.'),
+    ('20000000-0000-0000-0000-00000000000c', '11111111-1111-1111-1111-111111111111', '00000000-0000-0000-0000-000000000002', '2026-02-02', 45, 'Practiced file handling and exceptions.'),
+    ('20000000-0000-0000-0000-00000000000d', '22222222-2222-2222-2222-222222222222', '00000000-0000-0000-0000-000000000003', '2026-02-02', 65, 'Documented tradeoffs for caching.'),
+    ('20000000-0000-0000-0000-00000000000e', '33333333-3333-3333-3333-333333333333', '00000000-0000-0000-0000-000000000006', '2026-02-03', 50, 'Mapped security controls to OWASP Top 10.'),
+    ('20000000-0000-0000-0000-00000000000f', '44444444-4444-4444-4444-444444444444', '00000000-0000-0000-0000-000000000007', '2026-02-03', 70, 'Reviewed memory management strategies.');
+
+INSERT INTO reflections (id, session_id, rating, summary) VALUES
+    ('30000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001', 4, 'Normalization rules are clearer after practicing examples.'),
+    ('30000000-0000-0000-0000-000000000002', '20000000-0000-0000-0000-000000000002', 5, 'List comprehensions feel natural now.'),
+    ('30000000-0000-0000-0000-000000000003', '20000000-0000-0000-0000-000000000003', 4, 'Need to refine the load balancing section.'),
+    ('30000000-0000-0000-0000-000000000004', '20000000-0000-0000-0000-000000000004', 3, 'Tree traversals are still slow without notes.'),
+    ('30000000-0000-0000-0000-000000000005', '20000000-0000-0000-0000-000000000005', 5, 'Model evaluation metrics were straightforward.'),
+    ('30000000-0000-0000-0000-000000000006', '20000000-0000-0000-0000-000000000006', 4, 'Top 10 risks are clearer after mapping examples.'),
+    ('30000000-0000-0000-0000-000000000007', '20000000-0000-0000-0000-000000000007', 4, 'Scheduling algorithms comparison is solid.'),
+    ('30000000-0000-0000-0000-000000000008', '20000000-0000-0000-0000-000000000008', 3, 'Still confusing some TCP state transitions.'),
+    ('30000000-0000-0000-0000-000000000009', '20000000-0000-0000-0000-000000000009', 5, 'Dynamic programming patterns are clicking.'),
+    ('30000000-0000-0000-0000-00000000000a', '20000000-0000-0000-0000-00000000000a', 4, 'Indexing strategies feel more practical now.');
