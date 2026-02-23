@@ -3,6 +3,11 @@ from contextlib import contextmanager
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from psycopg2.extras import register_uuid
+
+
+# Ensure python uuid.UUID values from FastAPI path/query params are supported in SQL params.
+register_uuid()
 
 
 def _require_env(name: str) -> str:
