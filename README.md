@@ -138,14 +138,4 @@ You can also force a specific venv location:
 5. Set `DATABASE_URL` environment variable.
 6. Use `/health` endpoint to verify deployment.
 
-## Evidence for Submission
 
-Capture screenshots showing:
-
-1. API service running.
-2. Console client running.
-3. Full CRUD flow outputs.
-4. Data retrieval from GET endpoints.
-5. Hosted service status (if deployed to Render).
-
-Then combine screenshots into a PDF and include your repo URL in Blackboard.
