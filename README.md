@@ -1,11 +1,8 @@
-# LearningLog Project 2
+# LearningLog Project 3
 
-This repository now includes all required layers for **CSCE 548 Project 2**:
+This repository now includes all required layers for **CSCE 548 Project 3**:
 
-- Data layer (existing DAOs + SQL schema)
-- Business layer (service classes that wrap all DAO CRUD methods)
-- Service layer (FastAPI endpoints that expose all business methods)
-- Console client (invokes services over HTTP for end-to-end testing)
+- Fully working web ui
 
 ## Project Structure
 
