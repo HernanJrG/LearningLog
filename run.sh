@@ -6,7 +6,6 @@ MODE="${1:-api}"
 
 # Load local environment overrides (DATABASE_URL / DB_*).
 if [[ -f "$ROOT_DIR/.env" ]]; then
-  # shellcheck disable=SC1090
   set -a
   source "$ROOT_DIR/.env"
   set +a

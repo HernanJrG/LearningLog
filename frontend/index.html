@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LearningLog</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f6f9; color: #1e293b; }
+header { background: #1e40af; color: #fff; padding: 14px 24px; display: flex; align-items: center; gap: 18px; }
+header h1 { font-size: 1.3rem; font-weight: 600; }
+nav { display: flex; gap: 4px; }
+nav button { background: transparent; color: #cbd5e1; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: .9rem; transition: background .15s, color .15s; }
+nav button:hover { background: rgba(255,255,255,.12); color: #fff; }
+nav button.active { background: rgba(255,255,255,.2); color: #fff; font-weight: 600; }
+.container { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+.panel { display: none; }
+.panel.active { display: block; }
+.card { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 20px 24px; margin-bottom: 20px; }
+.card h2 { font-size: 1.1rem; margin-bottom: 14px; color: #1e40af; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-bottom: 14px; }
+.toolbar label { font-size: .8rem; color: #475569; display: flex; flex-direction: column; gap: 3px; }
+.toolbar input, .toolbar select { padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: .85rem; }
+.btn { padding: 7px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: .85rem; font-weight: 500; transition: background .15s; }
+.btn-primary { background: #2563eb; color: #fff; }
+.btn-primary:hover { background: #1d4ed8; }
+.btn-success { background: #16a34a; color: #fff; }
+.btn-success:hover { background: #15803d; }
+.btn-danger { background: #dc2626; color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-secondary { background: #e2e8f0; color: #334155; }
+.btn-secondary:hover { background: #cbd5e1; }
+.btn-sm { padding: 4px 10px; font-size: .78rem; }
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+th { text-align: left; padding: 8px 10px; background: #f1f5f9; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 600; }
+td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; }
+tr:hover td { background: #f8fafc; }
+.actions { display: flex; gap: 4px; }
+.toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; color: #fff; font-size: .85rem; z-index: 999; animation: slideIn .25s ease-out; max-width: 420px; word-break: break-word; }
+.toast.success { background: #16a34a; }
+.toast.error { background: #dc2626; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.modal { background: #fff; border-radius: 12px; padding: 24px 28px; width: 440px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,.18); }
+.modal h3 { margin-bottom: 16px; color: #1e40af; }
+.form-group { margin-bottom: 12px; }
+.form-group label { display: block; font-size: .8rem; color: #475569; margin-bottom: 3px; font-weight: 500; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: .85rem; }
+.form-group textarea { resize: vertical; min-height: 60px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.empty { text-align: center; padding: 24px; color: #94a3b8; font-size: .9rem; }
+.uuid { font-family: monospace; font-size: .78rem; color: #64748b; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>LearningLog</h1>
+  <nav id="mainNav">
+    <button data-tab="users" class="active">Users</button>
+    <button data-tab="topics">Topics</button>
+    <button data-tab="resources">Resources</button>
+    <button data-tab="sessions">Sessions</button>
+    <button data-tab="reflections">Reflections</button>
+  </nav>
+</header>
+
+<div class="container">
+  <!-- ==================== USERS ==================== -->
+  <div id="panel-users" class="panel active">
+    <div class="card">
+      <h2>Users</h2>
+      <div class="toolbar">
+        <label>Look up by email<input type="text" id="userEmailFilter" placeholder="user@example.com"></label>
+        <button class="btn btn-secondary" onclick="loadUserByEmail()">Search</button>
+        <button class="btn btn-secondary" onclick="loadUsers()">Show All</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-success" onclick="openUserForm()">+ New User</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Full Name</th><th>Email</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="usersTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== TOPICS ==================== -->
+  <div id="panel-topics" class="panel">
+    <div class="card">
+      <h2>Topics</h2>
+      <div class="toolbar">
+        <label>Filter by user<select id="topicUserFilter"><option value="">All users</option></select></label>
+        <button class="btn btn-secondary" onclick="loadTopics()">Refresh</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-success" onclick="openTopicForm()">+ New Topic</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Name</th><th>Description</th><th>User ID</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="topicsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== RESOURCES ==================== -->
+  <div id="panel-resources" class="panel">
+    <div class="card">
+      <h2>Resources</h2>
+      <div class="toolbar">
+        <label>Topic<select id="resourceTopicFilter" onchange="loadResources()"><option value="">-- select topic --</option></select></label>
+        <button class="btn btn-secondary" onclick="loadResources()">Refresh</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-success" onclick="openResourceForm()">+ New Resource</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Title</th><th>URL</th><th>Type</th><th>Topic ID</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="resourcesTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== SESSIONS ==================== -->
+  <div id="panel-sessions" class="panel">
+    <div class="card">
+      <h2>Learning Sessions</h2>
+      <div class="toolbar">
+        <label>Filter by
+          <select id="sessionFilterType" onchange="onSessionFilterTypeChange()">
+            <option value="user_id">User</option>
+            <option value="topic_id">Topic</option>
+          </select>
+        </label>
+        <label>Value<select id="sessionFilterValue" onchange="loadSessions()"><option value="">-- select --</option></select></label>
+        <button class="btn btn-secondary" onclick="loadSessions()">Refresh</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-success" onclick="openSessionForm()">+ New Session</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Date</th><th>Duration</th><th>Notes</th><th>User ID</th><th>Topic ID</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="sessionsTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== REFLECTIONS ==================== -->
+  <div id="panel-reflections" class="panel">
+    <div class="card">
+      <h2>Reflections</h2>
+      <div class="toolbar">
+        <label>Filter by
+          <select id="reflectionFilterType" onchange="onReflectionFilterTypeChange()">
+            <option value="session_id">Session</option>
+            <option value="topic_id">Topic</option>
+          </select>
+        </label>
+        <label>Value<select id="reflectionFilterValue" onchange="loadReflections()"><option value="">-- select --</option></select></label>
+        <button class="btn btn-secondary" onclick="loadReflections()">Refresh</button>
+        <div style="flex:1"></div>
+        <button class="btn btn-success" onclick="openReflectionForm()">+ New Reflection</button>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Rating</th><th>Summary</th><th>Session ID</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="reflectionsTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal container -->
+<div id="modalContainer"></div>
+
+<script>
+// ── Configuration ──────────────────────────────────────────────────
+const API = "";  // same-origin; change to e.g. "http://localhost:8000" if needed
+
+// ── Helpers ────────────────────────────────────────────────────────
+function shortId(uuid) { return uuid ? uuid.substring(0, 8) : ""; }
+function fmtDate(d) { if (!d) return ""; return new Date(d).toLocaleDateString(); }
+function fmtDatetime(d) { if (!d) return ""; return new Date(d).toLocaleString(); }
+
+function toast(msg, type) {
+  const el = document.createElement("div");
+  el.className = "toast " + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+async function api(method, path, body) {
+  const opts = { method, headers: {} };
+  if (body !== undefined) {
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(body);
+  }
+  const res = await fetch(API + path, opts);
+  const data = await res.json();
+  if (!res.ok) {
+    const detail = data.detail || JSON.stringify(data);
+    throw new Error(detail);
+  }
+  return data;
+}
+
+// ── Tab Navigation ─────────────────────────────────────────────────
+document.getElementById("mainNav").addEventListener("click", (e) => {
+  if (e.target.tagName !== "BUTTON") return;
+  const tab = e.target.dataset.tab;
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+  e.target.classList.add("active");
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel-" + tab).classList.add("active");
+  // Refresh data when switching tabs
+  const loaders = { users: loadUsers, topics: loadTopics, resources: loadResources, sessions: loadSessions, reflections: loadReflections };
+  loaders[tab]();
+});
+
+// ── Modal Helpers ──────────────────────────────────────────────────
+function openModal(title, fieldsHtml, onSave) {
+  const c = document.getElementById("modalContainer");
+  c.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <h3>${title}</h3>
+        <form id="modalForm">${fieldsHtml}
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
+  document.getElementById("modalForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try { await onSave(); closeModal(); } catch (err) { toast(err.message, "error"); }
+  });
+}
+function closeModal() { document.getElementById("modalContainer").innerHTML = ""; }
+
+function field(label, name, type, value, extra) {
+  extra = extra || "";
+  if (type === "textarea") return `<div class="form-group"><label>${label}</label><textarea name="${name}" ${extra}>${value || ""}</textarea></div>`;
+  if (type === "select") return `<div class="form-group"><label>${label}</label><select name="${name}" ${extra}>${value}</select></div>`;
+  return `<div class="form-group"><label>${label}</label><input type="${type}" name="${name}" value="${value || ""}" ${extra}></div>`;
+}
+function formVal(name) { return document.querySelector(`#modalForm [name="${name}"]`).value.trim(); }
+
+function emptyRow(cols, msg) { return `<tr><td colspan="${cols}" class="empty">${msg || "No records found."}</td></tr>`; }
+
+// ── Cached data for dropdowns ──────────────────────────────────────
+let cachedUsers = [];
+let cachedTopics = [];
+let cachedSessions = [];
+
+function userOptions(selected) {
+  return cachedUsers.map(u => `<option value="${u.id}" ${u.id===selected?"selected":""}>${u.full_name} (${u.email})</option>`).join("");
+}
+function topicOptions(selected) {
+  return cachedTopics.map(t => `<option value="${t.id}" ${t.id===selected?"selected":""}>${t.name}</option>`).join("");
+}
+function sessionOptions(selected) {
+  return cachedSessions.map(s => `<option value="${s.id}" ${s.id===selected?"selected":""}>${s.session_date} (${s.duration_minutes}min)</option>`).join("");
+}
+
+async function refreshCaches() {
+  try { cachedUsers = await api("GET", "/users"); } catch(e) { cachedUsers = []; }
+  try { cachedTopics = await api("GET", "/topics"); } catch(e) { cachedTopics = []; }
+  // Sessions require a filter, so we build from users
+  cachedSessions = [];
+  for (const u of cachedUsers) {
+    try {
+      const s = await api("GET", `/sessions?user_id=${u.id}`);
+      cachedSessions.push(...s);
+    } catch(e) { /* skip */ }
+  }
+  // Deduplicate sessions by id
+  const seen = new Set();
+  cachedSessions = cachedSessions.filter(s => { if (seen.has(s.id)) return false; seen.add(s.id); return true; });
+}
+
+// ── Populate filter dropdowns ──────────────────────────────────────
+function populateFilterDropdowns() {
+  // Topic user filter
+  const tuf = document.getElementById("topicUserFilter");
+  const tufVal = tuf.value;
+  tuf.innerHTML = `<option value="">All users</option>` + userOptions();
+  tuf.value = tufVal;
+
+  // Resource topic filter
+  const rtf = document.getElementById("resourceTopicFilter");
+  const rtfVal = rtf.value;
+  rtf.innerHTML = `<option value="">-- select topic --</option>` + topicOptions();
+  rtf.value = rtfVal;
+
+  // Session filter
+  onSessionFilterTypeChange();
+
+  // Reflection filter
+  onReflectionFilterTypeChange();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// USERS
+// ══════════════════════════════════════════════════════════════════
+async function loadUsers() {
+  try {
+    const users = await api("GET", "/users");
+    cachedUsers = users;
+    populateFilterDropdowns();
+    const tb = document.getElementById("usersTable");
+    if (!users.length) { tb.innerHTML = emptyRow(5); return; }
+    tb.innerHTML = users.map(u => `<tr>
+      <td class="uuid" title="${u.id}">${shortId(u.id)}</td>
+      <td>${u.full_name}</td><td>${u.email}</td><td>${fmtDatetime(u.created_at)}</td>
+      <td class="actions">
+        <button class="btn btn-primary btn-sm" onclick="viewUser('${u.id}')">View</button>
+        <button class="btn btn-secondary btn-sm" onclick="openUserForm('${u.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button>
+      </td></tr>`).join("");
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function loadUserByEmail() {
+  const email = document.getElementById("userEmailFilter").value.trim();
+  if (!email) { toast("Enter an email to search", "error"); return; }
+  try {
+    const u = await api("GET", `/users/by-email?email=${encodeURIComponent(email)}`);
+    const tb = document.getElementById("usersTable");
+    tb.innerHTML = `<tr>
+      <td class="uuid" title="${u.id}">${shortId(u.id)}</td>
+      <td>${u.full_name}</td><td>${u.email}</td><td>${fmtDatetime(u.created_at)}</td>
+      <td class="actions">
+        <button class="btn btn-primary btn-sm" onclick="viewUser('${u.id}')">View</button>
+        <button class="btn btn-secondary btn-sm" onclick="openUserForm('${u.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')">Del</button>
+      </td></tr>`;
+    toast("Found user: " + u.full_name, "success");
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function viewUser(id) {
+  try {
+    const u = await api("GET", `/users/${id}`);
+    openModal("User Details", `
+      <div class="form-group"><label>ID</label><input type="text" value="${u.id}" readonly></div>
+      ${field("Full Name", "_", "text", u.full_name, "readonly")}
+      ${field("Email", "_", "text", u.email, "readonly")}
+      ${field("Created", "_", "text", fmtDatetime(u.created_at), "readonly")}
+      `, () => closeModal());
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function openUserForm(editId) {
+  let existing = null;
+  if (editId) {
+    try { existing = await api("GET", `/users/${editId}`); } catch(e) { toast(e.message, "error"); return; }
+  }
+  const title = existing ? "Edit User" : "New User";
+  const html = field("Full Name", "full_name", "text", existing?.full_name, "required") +
+               field("Email", "email", "email", existing?.email, "required");
+  openModal(title, html, async () => {
+    const body = { full_name: formVal("full_name"), email: formVal("email") };
+    if (existing) { await api("PUT", `/users/${editId}`, body); toast("User updated", "success"); }
+    else { await api("POST", "/users", body); toast("User created", "success"); }
+    loadUsers();
+  });
+}
+
+async function deleteUser(id) {
+  if (!confirm("Delete this user? This will cascade-delete all related data.")) return;
+  try { await api("DELETE", `/users/${id}`); toast("User deleted", "success"); loadUsers(); }
+  catch(e) { toast(e.message, "error"); }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TOPICS
+// ══════════════════════════════════════════════════════════════════
+async function loadTopics() {
+  try {
+    const userId = document.getElementById("topicUserFilter").value;
+    const url = userId ? `/topics?user_id=${userId}` : "/topics";
+    const topics = await api("GET", url);
+    cachedTopics = userId ? cachedTopics : topics;  // only update full cache on unfiltered
+    if (!userId) populateFilterDropdowns();
+    const tb = document.getElementById("topicsTable");
+    if (!topics.length) { tb.innerHTML = emptyRow(6); return; }
+    tb.innerHTML = topics.map(t => `<tr>
+      <td class="uuid" title="${t.id}">${shortId(t.id)}</td>
+      <td>${t.name}</td><td>${t.description || ""}</td>
+      <td class="uuid" title="${t.user_id}">${shortId(t.user_id)}</td>
+      <td>${fmtDatetime(t.created_at)}</td>
+      <td class="actions">
+        <button class="btn btn-primary btn-sm" onclick="viewTopic('${t.id}')">View</button>
+        <button class="btn btn-secondary btn-sm" onclick="openTopicForm('${t.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteTopic('${t.id}')">Del</button>
+      </td></tr>`).join("");
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function viewTopic(id) {
+  try {
+    const t = await api("GET", `/topics/${id}`);
+    openModal("Topic Details", `
+      <div class="form-group"><label>ID</label><input type="text" value="${t.id}" readonly></div>
+      ${field("Name", "_", "text", t.name, "readonly")}
+      ${field("Description", "_", "text", t.description || "", "readonly")}
+      <div class="form-group"><label>User ID</label><input type="text" value="${t.user_id}" readonly></div>
+      ${field("Created", "_", "text", fmtDatetime(t.created_at), "readonly")}
+      `, () => closeModal());
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function openTopicForm(editId) {
+  let existing = null;
+  if (editId) {
+    try { existing = await api("GET", `/topics/${editId}`); } catch(e) { toast(e.message, "error"); return; }
+  }
+  const title = existing ? "Edit Topic" : "New Topic";
+  const userOpts = userOptions(existing?.user_id);
+  const html = (existing ? "" : field("User", "user_id", "select", userOpts, "required")) +
+               field("Name", "name", "text", existing?.name, "required") +
+               field("Description", "description", "textarea", existing?.description);
+  openModal(title, html, async () => {
+    if (existing) {
+      const body = { name: formVal("name"), description: formVal("description") || null };
+      await api("PUT", `/topics/${editId}`, body); toast("Topic updated", "success");
+    } else {
+      const body = { user_id: formVal("user_id"), name: formVal("name"), description: formVal("description") || null };
+      await api("POST", "/topics", body); toast("Topic created", "success");
+    }
+    loadTopics();
+  });
+}
+
+async function deleteTopic(id) {
+  if (!confirm("Delete this topic?")) return;
+  try { await api("DELETE", `/topics/${id}`); toast("Topic deleted", "success"); loadTopics(); }
+  catch(e) { toast(e.message, "error"); }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RESOURCES
+// ══════════════════════════════════════════════════════════════════
+async function loadResources() {
+  const topicId = document.getElementById("resourceTopicFilter").value;
+  if (!topicId) {
+    document.getElementById("resourcesTable").innerHTML = emptyRow(6, "Select a topic to view resources.");
+    return;
+  }
+  try {
+    const resources = await api("GET", `/resources?topic_id=${topicId}`);
+    const tb = document.getElementById("resourcesTable");
+    if (!resources.length) { tb.innerHTML = emptyRow(6); return; }
+    tb.innerHTML = resources.map(r => `<tr>
+      <td class="uuid" title="${r.id}">${shortId(r.id)}</td>
+      <td>${r.title}</td><td><a href="${r.url}" target="_blank">${r.url}</a></td>
+      <td>${r.resource_type}</td>
+      <td class="uuid" title="${r.topic_id}">${shortId(r.topic_id)}</td>
+      <td>${fmtDatetime(r.created_at)}</td>
+      <td class="actions">
+        <button class="btn btn-primary btn-sm" onclick="viewResource('${r.id}')">View</button>
+        <button class="btn btn-secondary btn-sm" onclick="openResourceForm('${r.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteResource('${r.id}')">Del</button>
+      </td></tr>`).join("");
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function viewResource(id) {
+  try {
+    const r = await api("GET", `/resources/${id}`);
+    openModal("Resource Details", `
+      <div class="form-group"><label>ID</label><input type="text" value="${r.id}" readonly></div>
+      ${field("Title", "_", "text", r.title, "readonly")}
+      ${field("URL", "_", "text", r.url, "readonly")}
+      ${field("Type", "_", "text", r.resource_type, "readonly")}
+      <div class="form-group"><label>Topic ID</label><input type="text" value="${r.topic_id}" readonly></div>
+      ${field("Created", "_", "text", fmtDatetime(r.created_at), "readonly")}
+      `, () => closeModal());
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function openResourceForm(editId) {
+  let existing = null;
+  if (editId) {
+    try { existing = await api("GET", `/resources/${editId}`); } catch(e) { toast(e.message, "error"); return; }
+  }
+  const title = existing ? "Edit Resource" : "New Resource";
+  const topicOpts = topicOptions(existing?.topic_id);
+  const html = (existing ? "" : field("Topic", "topic_id", "select", topicOpts, "required")) +
+               field("Title", "title", "text", existing?.title, "required") +
+               field("URL", "url", "url", existing?.url, "required") +
+               field("Type", "resource_type", "text", existing?.resource_type, "required placeholder=\"e.g. article, video, book\"");
+  openModal(title, html, async () => {
+    if (existing) {
+      const body = { title: formVal("title"), url: formVal("url"), resource_type: formVal("resource_type") };
+      await api("PUT", `/resources/${editId}`, body); toast("Resource updated", "success");
+    } else {
+      const body = { topic_id: formVal("topic_id"), title: formVal("title"), url: formVal("url"), resource_type: formVal("resource_type") };
+      await api("POST", "/resources", body); toast("Resource created", "success");
+    }
+    loadResources();
+  });
+}
+
+async function deleteResource(id) {
+  if (!confirm("Delete this resource?")) return;
+  try { await api("DELETE", `/resources/${id}`); toast("Resource deleted", "success"); loadResources(); }
+  catch(e) { toast(e.message, "error"); }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SESSIONS
+// ══════════════════════════════════════════════════════════════════
+function onSessionFilterTypeChange() {
+  const type = document.getElementById("sessionFilterType").value;
+  const sel = document.getElementById("sessionFilterValue");
+  if (type === "user_id") {
+    sel.innerHTML = `<option value="">-- select user --</option>` + userOptions();
+  } else {
+    sel.innerHTML = `<option value="">-- select topic --</option>` + topicOptions();
+  }
+}
+
+async function loadSessions() {
+  const filterType = document.getElementById("sessionFilterType").value;
+  const filterVal = document.getElementById("sessionFilterValue").value;
+  if (!filterVal) {
+    document.getElementById("sessionsTable").innerHTML = emptyRow(8, "Select a user or topic to view sessions.");
+    return;
+  }
+  try {
+    const sessions = await api("GET", `/sessions?${filterType}=${filterVal}`);
+    const tb = document.getElementById("sessionsTable");
+    if (!sessions.length) { tb.innerHTML = emptyRow(8); return; }
+    tb.innerHTML = sessions.map(s => `<tr>
+      <td class="uuid" title="${s.id}">${shortId(s.id)}</td>
+      <td>${s.session_date}</td><td>${s.duration_minutes} min</td>
+      <td>${s.notes || ""}</td>
+      <td class="uuid" title="${s.user_id}">${shortId(s.user_id)}</td>
+      <td class="uuid" title="${s.topic_id}">${shortId(s.topic_id)}</td>
+      <td>${fmtDatetime(s.created_at)}</td>
+      <td class="actions">
+        <button class="btn btn-primary btn-sm" onclick="viewSession('${s.id}')">View</button>
+        <button class="btn btn-secondary btn-sm" onclick="openSessionForm('${s.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteSession('${s.id}')">Del</button>
+      </td></tr>`).join("");
+    // Update cached sessions
+    for (const s of sessions) {
+      if (!cachedSessions.find(cs => cs.id === s.id)) cachedSessions.push(s);
+    }
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function viewSession(id) {
+  try {
+    const s = await api("GET", `/sessions/${id}`);
+    openModal("Session Details", `
+      <div class="form-group"><label>ID</label><input type="text" value="${s.id}" readonly></div>
+      ${field("Date", "_", "text", s.session_date, "readonly")}
+      ${field("Duration (min)", "_", "text", s.duration_minutes, "readonly")}
+      ${field("Notes", "_", "textarea", s.notes || "", "readonly")}
+      <div class="form-group"><label>User ID</label><input type="text" value="${s.user_id}" readonly></div>
+      <div class="form-group"><label>Topic ID</label><input type="text" value="${s.topic_id}" readonly></div>
+      ${field("Created", "_", "text", fmtDatetime(s.created_at), "readonly")}
+      `, () => closeModal());
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function openSessionForm(editId) {
+  let existing = null;
+  if (editId) {
+    try { existing = await api("GET", `/sessions/${editId}`); } catch(e) { toast(e.message, "error"); return; }
+  }
+  const title = existing ? "Edit Session" : "New Session";
+  const html = (existing ? "" : field("User", "user_id", "select", userOptions(), "required")) +
+               (existing ? "" : field("Topic", "topic_id", "select", topicOptions(), "required")) +
+               field("Date", "session_date", "date", existing?.session_date, "required") +
+               field("Duration (minutes)", "duration_minutes", "number", existing?.duration_minutes, "required min=\"1\"") +
+               field("Notes", "notes", "textarea", existing?.notes);
+  openModal(title, html, async () => {
+    if (existing) {
+      const body = { session_date: formVal("session_date"), duration_minutes: parseInt(formVal("duration_minutes")), notes: formVal("notes") || null };
+      await api("PUT", `/sessions/${editId}`, body); toast("Session updated", "success");
+    } else {
+      const body = { user_id: formVal("user_id"), topic_id: formVal("topic_id"), session_date: formVal("session_date"), duration_minutes: parseInt(formVal("duration_minutes")), notes: formVal("notes") || null };
+      await api("POST", "/sessions", body); toast("Session created", "success");
+    }
+    loadSessions();
+    refreshCaches();
+  });
+}
+
+async function deleteSession(id) {
+  if (!confirm("Delete this session?")) return;
+  try { await api("DELETE", `/sessions/${id}`); toast("Session deleted", "success"); loadSessions(); refreshCaches(); }
+  catch(e) { toast(e.message, "error"); }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// REFLECTIONS
+// ══════════════════════════════════════════════════════════════════
+function onReflectionFilterTypeChange() {
+  const type = document.getElementById("reflectionFilterType").value;
+  const sel = document.getElementById("reflectionFilterValue");
+  if (type === "session_id") {
+    sel.innerHTML = `<option value="">-- select session --</option>` + sessionOptions();
+  } else {
+    sel.innerHTML = `<option value="">-- select topic --</option>` + topicOptions();
+  }
+}
+
+async function loadReflections() {
+  const filterType = document.getElementById("reflectionFilterType").value;
+  const filterVal = document.getElementById("reflectionFilterValue").value;
+  if (!filterVal) {
+    document.getElementById("reflectionsTable").innerHTML = emptyRow(5, "Select a session or topic to view reflections.");
+    return;
+  }
+  try {
+    const reflections = await api("GET", `/reflections?${filterType}=${filterVal}`);
+    const tb = document.getElementById("reflectionsTable");
+    if (!reflections.length) { tb.innerHTML = emptyRow(5); return; }
+    tb.innerHTML = reflections.map(r => `<tr>
+      <td class="uuid" title="${r.id}">${shortId(r.id)}</td>
+      <td>${"&#9733;".repeat(r.rating)}${"&#9734;".repeat(5 - r.rating)}</td>
+      <td>${r.summary}</td>
+      <td class="uuid" title="${r.session_id}">${shortId(r.session_id)}</td>
+      <td>${fmtDatetime(r.created_at)}</td>
+      <td class="actions">
+        <button class="btn btn-primary btn-sm" onclick="viewReflection('${r.id}')">View</button>
+        <button class="btn btn-secondary btn-sm" onclick="openReflectionForm('${r.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteReflection('${r.id}')">Del</button>
+      </td></tr>`).join("");
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function viewReflection(id) {
+  try {
+    const r = await api("GET", `/reflections/${id}`);
+    openModal("Reflection Details", `
+      <div class="form-group"><label>ID</label><input type="text" value="${r.id}" readonly></div>
+      ${field("Rating", "_", "text", r.rating + " / 5", "readonly")}
+      ${field("Summary", "_", "textarea", r.summary, "readonly")}
+      <div class="form-group"><label>Session ID</label><input type="text" value="${r.session_id}" readonly></div>
+      ${field("Created", "_", "text", fmtDatetime(r.created_at), "readonly")}
+      `, () => closeModal());
+  } catch(e) { toast(e.message, "error"); }
+}
+
+async function openReflectionForm(editId) {
+  let existing = null;
+  if (editId) {
+    try { existing = await api("GET", `/reflections/${editId}`); } catch(e) { toast(e.message, "error"); return; }
+  }
+  const title = existing ? "Edit Reflection" : "New Reflection";
+  const ratingOpts = [1,2,3,4,5].map(n => `<option value="${n}" ${existing?.rating===n?"selected":""}>${n} - ${"&#9733;".repeat(n)}${"&#9734;".repeat(5-n)}</option>`).join("");
+  const html = (existing ? "" : field("Session", "session_id", "select", sessionOptions(), "required")) +
+               field("Rating", "rating", "select", ratingOpts, "required") +
+               field("Summary", "summary", "textarea", existing?.summary, "required");
+  openModal(title, html, async () => {
+    if (existing) {
+      const body = { rating: parseInt(formVal("rating")), summary: formVal("summary") };
+      await api("PUT", `/reflections/${editId}`, body); toast("Reflection updated", "success");
+    } else {
+      const body = { session_id: formVal("session_id"), rating: parseInt(formVal("rating")), summary: formVal("summary") };
+      await api("POST", "/reflections", body); toast("Reflection created", "success");
+    }
+    loadReflections();
+  });
+}
+
+async function deleteReflection(id) {
+  if (!confirm("Delete this reflection?")) return;
+  try { await api("DELETE", `/reflections/${id}`); toast("Reflection deleted", "success"); loadReflections(); }
+  catch(e) { toast(e.message, "error"); }
+}
+
+// ── Init ───────────────────────────────────────────────────────────
+async function init() {
+  await refreshCaches();
+  populateFilterDropdowns();
+  loadUsers();
+}
+init();
+</script>
+</body>
+</html>

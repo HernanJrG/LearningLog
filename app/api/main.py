@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from fastapi import FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.routers.reflections import router as reflections_router
 from app.api.routers.resources import router as resources_router
@@ -19,6 +23,13 @@ app = FastAPI(
     title="LearningLog Service API",
     description="Service layer for Project 2 business methods.",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -64,4 +75,8 @@ app.include_router(topics_router)
 app.include_router(resources_router)
 app.include_router(sessions_router)
 app.include_router(reflections_router)
+
+_frontend_dir = Path(__file__).resolve().parent.parent.parent / "frontend"
+if _frontend_dir.is_dir():
+    app.mount("/app", StaticFiles(directory=str(_frontend_dir), html=True), name="frontend")
 

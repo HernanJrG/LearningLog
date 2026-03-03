@@ -132,10 +132,4 @@ You can also force a specific venv location:
 ## Hosting Notes (Render)
 
 1. Push this repo to GitHub.
-2. Create Render Web Service from the repo.
-3. Build command: `pip install -r requirements.txt`
-4. Start command: `uvicorn app.api.main:app --host 0.0.0.0 --port $PORT`
-5. Set `DATABASE_URL` environment variable.
-6. Use `/health` endpoint to verify deployment.
-
-
+2. Create Render Web Service 
